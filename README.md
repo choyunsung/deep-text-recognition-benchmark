@@ -11,6 +11,15 @@ Based on this framework, we recorded the 1st place of [ICDAR2013 focused scene t
 The difference between our paper and ICDAR challenge is summarized [here](https://github.com/clovaai/deep-text-recognition-benchmark/issues/13).
 
 ## Updates
+**Dec 2024**: **v2.0.0** - Major modernization update for latest PyTorch compatibility:
+- Updated to PyTorch 2.0+ compatibility
+- Replaced deprecated `torch._utils._accumulate` with `itertools.accumulate`
+- Removed `six` library dependency (Python 3 standard library)
+- Updated `F.sigmoid` to `torch.sigmoid`
+- Fixed `grid_sample` compatibility issues
+- Added comprehensive `requirements.txt` with latest versions
+- Improved code stability and maintainability
+
 **Aug 3, 2020**: added [guideline to use Baidu warpctc](https://github.com/clovaai/deep-text-recognition-benchmark/pull/209) which reproduces CTC results of our paper. <br>
 **Dec 27, 2019**: added [FLOPS](https://github.com/clovaai/deep-text-recognition-benchmark/issues/125) in our paper, and minor updates such as log_dataset.txt and [ICDAR2019-NormalizedED](https://github.com/clovaai/deep-text-recognition-benchmark/blob/86451088248e0490ff8b5f74d33f7d014f6c249a/test.py#L139-L165). <br>
 **Oct 22, 2019**: added [confidence score](https://github.com/clovaai/deep-text-recognition-benchmark/issues/82), and arranged the output form of training logs. <br>
@@ -23,11 +32,20 @@ The difference between our paper and ICDAR challenge is summarized [here](https:
 
 ## Getting Started
 ### Dependency
-- This work was tested with PyTorch 1.3.1, CUDA 10.1, python 3.6 and Ubuntu 16.04. <br> You may need `pip3 install torch==1.3.1`. <br>
-In the paper, expriments were performed with **PyTorch 0.4.1, CUDA 9.0**.
-- requirements : lmdb, pillow, torchvision, nltk, natsort
+- **v2.0.0+**: Updated for PyTorch 2.0+, CUDA 11.8+, Python 3.8+ compatibility
+- **Legacy**: This work was originally tested with PyTorch 1.3.1, CUDA 10.1, python 3.6 and Ubuntu 16.04
+- In the paper, experiments were performed with **PyTorch 0.4.1, CUDA 9.0**
+
+#### Quick Installation (Recommended)
+```bash
+pip install -r requirements.txt
 ```
-pip3 install lmdb pillow torchvision nltk natsort
+
+#### Manual Installation
+```bash
+pip install torch>=2.0.0 torchvision>=0.15.0 numpy>=1.21.0
+pip install Pillow>=9.0.0 opencv-python>=4.5.0
+pip install lmdb>=1.4.0 natsort>=8.0.0 nltk>=3.8.0
 ```
 
 ### Download lmdb dataset for traininig and evaluation from [here](https://www.dropbox.com/sh/i39abvnefllx2si/AAAbAYRvxzRp3cIE5HzqUw3ra?dl=0)

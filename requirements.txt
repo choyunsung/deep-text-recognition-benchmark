@@ -38,6 +38,14 @@ fire>=0.4.0,<1.0.0
 # warpctc-pytorch>=0.1.1
 
 # =============================================================================
+# PERFORMANCE & MONITORING
+# =============================================================================
+# Uncomment for performance monitoring and profiling
+# tensorboard>=2.10.0,<3.0.0
+# psutil>=5.9.0,<6.0.0
+# memory-profiler>=0.60.0,<1.0.0
+
+# =============================================================================
 # DEVELOPMENT & TESTING (Optional)
 # =============================================================================
 # Uncomment the following lines for development environment

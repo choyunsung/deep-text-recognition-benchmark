@@ -70,7 +70,10 @@ class Batch_Balanced_Dataset(object):
                 _dataset, batch_size=_batch_size,
                 shuffle=True,
                 num_workers=int(opt.workers),
-                collate_fn=_AlignCollate, pin_memory=True)
+                collate_fn=_AlignCollate, 
+                pin_memory=True,
+                persistent_workers=True if int(opt.workers) > 0 else False,
+                prefetch_factor=2 if int(opt.workers) > 0 else 2)
             self.data_loader_list.append(_data_loader)
             self.dataloader_iter_list.append(iter(_data_loader))
 

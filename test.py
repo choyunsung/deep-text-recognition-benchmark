@@ -201,7 +201,11 @@ def test(opt):
     print('model input parameters', opt.imgH, opt.imgW, opt.num_fiducial, opt.input_channel, opt.output_channel,
           opt.hidden_size, opt.num_class, opt.batch_max_length, opt.Transformation, opt.FeatureExtraction,
           opt.SequenceModeling, opt.Prediction)
-    model = torch.nn.DataParallel(model).to(device)
+    # Use appropriate parallelization based on GPU count
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.parallel.DistributedDataParallel(model.to(device))
+    else:
+        model = model.to(device)
 
     # load model
     print('loading pretrained model from %s' % opt.saved_model)

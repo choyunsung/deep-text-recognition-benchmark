@@ -7,7 +7,13 @@ import argparse
 
 import torch
 import torch.backends.cudnn as cudnn
-import torch.nn.init as init
+from torch.cuda.amp import autocast, GradScaler
+# Handle torch.nn.init compatibility
+try:
+    import torch.nn.init as init
+except ImportError:
+    # Fallback for newer PyTorch versions
+    import torch.nn.init as init
 import torch.optim as optim
 import torch.utils.data
 import numpy as np
@@ -75,8 +81,12 @@ def train(opt):
                 param.data.fill_(1)
             continue
 
-    # data parallel for multi-GPU
-    model = torch.nn.DataParallel(model).to(device)
+    # data parallel for multi-GPU - use DistributedDataParallel for better performance
+    if opt.num_gpu > 1:
+        # Use DistributedDataParallel for better performance and memory efficiency
+        model = torch.nn.parallel.DistributedDataParallel(model.to(device))
+    else:
+        model = model.to(device)
     model.train()
     if opt.saved_model != '':
         print(f'loading pretrained model from {opt.saved_model}')
@@ -99,6 +109,9 @@ def train(opt):
         criterion = torch.nn.CrossEntropyLoss(ignore_index=0).to(device)  # ignore [GO] token = ignore index 0
     # loss averager
     loss_avg = Averager()
+    
+    # Mixed precision training for better performance and memory efficiency
+    scaler = GradScaler() if torch.cuda.is_available() else None
 
     # filter that only require gradient decent
     filtered_parameters = []
@@ -149,25 +162,49 @@ def train(opt):
         text, length = converter.encode(labels, batch_max_length=opt.batch_max_length)
         batch_size = image.size(0)
 
-        if 'CTC' in opt.Prediction:
-            preds = model(image, text)
-            preds_size = torch.IntTensor([preds.size(1)] * batch_size)
-            if opt.baiduCTC:
-                preds = preds.permute(1, 0, 2)  # to use CTCLoss format
-                cost = criterion(preds, text, preds_size, length) / batch_size
-            else:
-                preds = preds.log_softmax(2).permute(1, 0, 2)
-                cost = criterion(preds, text, preds_size, length)
+        # Use mixed precision training for better performance
+        if scaler is not None:
+            with autocast():
+                if 'CTC' in opt.Prediction:
+                    preds = model(image, text)
+                    preds_size = torch.IntTensor([preds.size(1)] * batch_size)
+                    if opt.baiduCTC:
+                        preds = preds.permute(1, 0, 2)  # to use CTCLoss format
+                        cost = criterion(preds, text, preds_size, length) / batch_size
+                    else:
+                        preds = preds.log_softmax(2).permute(1, 0, 2)
+                        cost = criterion(preds, text, preds_size, length)
+                else:
+                    preds = model(image, text[:, :-1])  # align with Attention.forward
+                    target = text[:, 1:]  # without [GO] Symbol
+                    cost = criterion(preds.view(-1, preds.shape[-1]), target.contiguous().view(-1))
 
+            model.zero_grad()
+            scaler.scale(cost).backward()
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip)
+            scaler.step(optimizer)
+            scaler.update()
         else:
-            preds = model(image, text[:, :-1])  # align with Attention.forward
-            target = text[:, 1:]  # without [GO] Symbol
-            cost = criterion(preds.view(-1, preds.shape[-1]), target.contiguous().view(-1))
+            # Fallback for CPU or older PyTorch versions
+            if 'CTC' in opt.Prediction:
+                preds = model(image, text)
+                preds_size = torch.IntTensor([preds.size(1)] * batch_size)
+                if opt.baiduCTC:
+                    preds = preds.permute(1, 0, 2)  # to use CTCLoss format
+                    cost = criterion(preds, text, preds_size, length) / batch_size
+                else:
+                    preds = preds.log_softmax(2).permute(1, 0, 2)
+                    cost = criterion(preds, text, preds_size, length)
+            else:
+                preds = model(image, text[:, :-1])  # align with Attention.forward
+                target = text[:, 1:]  # without [GO] Symbol
+                cost = criterion(preds.view(-1, preds.shape[-1]), target.contiguous().view(-1))
 
-        model.zero_grad()
-        cost.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip)  # gradient clipping with 5 (Default)
-        optimizer.step()
+            model.zero_grad()
+            cost.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip)
+            optimizer.step()
 
         loss_avg.add(cost)
 

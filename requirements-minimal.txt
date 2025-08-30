@@ -1,0 +1,21 @@
+# Minimal requirements for Deep Text Recognition Benchmark
+# Essential packages only - for production use
+
+# Core ML/DL
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.21.0
+
+# Image processing
+Pillow>=9.0.0
+opencv-python>=4.5.0
+
+# Data handling
+lmdb>=1.4.0
+natsort>=8.0.0
+
+# NLP
+nltk>=3.8.0
+
+# CLI utilities
+fire>=0.4.0

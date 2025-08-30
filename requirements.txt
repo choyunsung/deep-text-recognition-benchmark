@@ -1,0 +1,62 @@
+# Deep Text Recognition Benchmark - Complete Dependencies
+# Compatible with latest PyTorch and other libraries
+# Updated for v2.0.0 - December 2024
+
+# =============================================================================
+# CORE MACHINE LEARNING & DEEP LEARNING
+# =============================================================================
+torch>=2.0.0,<3.0.0
+torchvision>=0.15.0,<1.0.0
+numpy>=1.21.0,<2.0.0
+
+# =============================================================================
+# IMAGE PROCESSING & COMPUTER VISION
+# =============================================================================
+Pillow>=9.0.0,<11.0.0
+opencv-python>=4.5.0,<5.0.0
+
+# =============================================================================
+# DATA HANDLING & STORAGE
+# =============================================================================
+lmdb>=1.4.0,<2.0.0
+natsort>=8.0.0,<9.0.0
+
+# =============================================================================
+# NATURAL LANGUAGE PROCESSING
+# =============================================================================
+nltk>=3.8.0,<4.0.0
+
+# =============================================================================
+# UTILITIES & COMMAND LINE INTERFACE
+# =============================================================================
+fire>=0.4.0,<1.0.0
+
+# =============================================================================
+# OPTIONAL: ADVANCED CTC IMPLEMENTATION
+# =============================================================================
+# Uncomment the line below if you need Baidu's warpctc for CTC training
+# warpctc-pytorch>=0.1.1
+
+# =============================================================================
+# DEVELOPMENT & TESTING (Optional)
+# =============================================================================
+# Uncomment the following lines for development environment
+# pytest>=7.0.0,<8.0.0
+# tqdm>=4.64.0,<5.0.0
+# jupyter>=1.0.0,<2.0.0
+# matplotlib>=3.5.0,<4.0.0
+
+# =============================================================================
+# INSTALLATION NOTES
+# =============================================================================
+# 1. For CUDA support, install PyTorch with CUDA:
+#    pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+#
+# 2. For CPU-only installation:
+#    pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+#
+# 3. For Apple Silicon (M1/M2) Macs:
+#    pip install torch torchvision
+#
+# 4. Minimum Python version: 3.8
+# 5. Recommended Python version: 3.9 or 3.10

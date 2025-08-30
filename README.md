@@ -37,15 +37,36 @@ The difference between our paper and ICDAR challenge is summarized [here](https:
 - In the paper, experiments were performed with **PyTorch 0.4.1, CUDA 9.0**
 
 #### Quick Installation (Recommended)
+
+**For production use (minimal dependencies):**
+```bash
+pip install -r requirements-minimal.txt
+```
+
+**For development (includes testing tools):**
 ```bash
 pip install -r requirements.txt
 ```
 
 #### Manual Installation
 ```bash
+# Core dependencies
 pip install torch>=2.0.0 torchvision>=0.15.0 numpy>=1.21.0
 pip install Pillow>=9.0.0 opencv-python>=4.5.0
-pip install lmdb>=1.4.0 natsort>=8.0.0 nltk>=3.8.0
+pip install lmdb>=1.4.0 natsort>=8.0.0 nltk>=3.8.0 fire>=0.4.0
+```
+
+#### CUDA Support
+For GPU acceleration, install PyTorch with CUDA support:
+```bash
+# CUDA 11.8
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+
+# CUDA 12.1
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+
+# CPU only
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 ```
 
 ### Download lmdb dataset for traininig and evaluation from [here](https://www.dropbox.com/sh/i39abvnefllx2si/AAAbAYRvxzRp3cIE5HzqUw3ra?dl=0)
